@@ -9,7 +9,7 @@ FILE *p_err_log_f = NULL;          // log file for errors
 
 /* LOCAL FUNC. HEADERS */
 
-bool program_init();
+bool program_init(void);
 void at_exit(void);
 
 /* PROGRAM ENTRY POINT */
@@ -25,7 +25,7 @@ int main(void)
 
     const char *text = "Hello, World!";
 
-    printw(text);  refresh();
+    printw("%s\n", text);  refresh();
 
     return exit_value;
 }  // {} main()
@@ -34,7 +34,7 @@ int main(void)
 /* LOCAL FUNC. */
 
 /* initialization of ncurses etc. */
-bool program_init() {
+bool program_init(void) {
     bool ret_val = true;
 
     // registering an exit function
