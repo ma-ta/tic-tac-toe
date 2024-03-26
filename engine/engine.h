@@ -1,5 +1,5 @@
-#ifndef PISKVORKY_AI_TRENINK_H
-#define PISKVORKY_AI_TRENINK_H
+#ifndef ENGINE_H
+#define ENGINE_H
 
 
 /*        A       B       C
@@ -18,10 +18,6 @@
  *    /////////////////////////
  */
 
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
 
 
 typedef enum {
@@ -64,7 +60,7 @@ typedef struct {
 
 
 /* vytvoří nový strom hry */
-bool inicializuj(hra_strom_t* strom_hry, unsigned velikost_pole);
+bool inicializuj(hra_strom_t* strom_hry, unsigned char velikost_pole, unsigned char souvisla_rada);
 /* spustí prověřování možných cest hry
    vrátí počet možných stavů hry */
 unsigned long long trenuj(hra_strom_t* hra_strom);
@@ -75,4 +71,4 @@ bool uklid(hra_strom_t* hraStrom);
 void vypis_uzel(hra_uzel_t *uzel, unsigned velikost_pole);
 
 
-#endif //PISKVORKY_AI_TRENINK_H
+#endif // # ENGINE_H

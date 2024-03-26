@@ -1,5 +1,7 @@
-#include "trenink.h"
-#include "chyby.h"
+#define DEBUG
+
+#include "global.h"
+#include "engine.h"
 
 
 static const char HRACI_SYM[] = { 'X', 'O' };
@@ -17,15 +19,17 @@ static bool pole_zapis(hra_uzel_t *uzel, unsigned velikost_pole, souradnice_t xy
 static hraci_t pole_precti(hra_uzel_t *uzel, unsigned velikost_pole, souradnice_t xy);
 
 
-/* neveřejné funkce */
-
 /* TEST MODULU */
-#define DEBUG
 #ifdef DEBUG
 
+int exit_value = EXIT_SUCCESS;
+unsigned long long err_count = 0;
+bool err_log_on = true;
+
 int main(void) {
+
     hra_strom_t hra = { NULL };
-    inicializuj(&hra, 3);
+    inicializuj(&hra, 3, 3);
     printf("%d\n", vyhodnot_uzel(hra.zacatek, hra.velikost_pole, hra.souvisla_rada));
     pole_zapis(hra.zacatek, hra.velikost_pole, (souradnice_t) { 1, 1 }, HRAC_1);
     pole_zapis(hra.zacatek, hra.velikost_pole, (souradnice_t) { 0, 2 }, HRAC_1);
@@ -33,11 +37,14 @@ int main(void) {
     vypis_uzel(hra.zacatek, hra.velikost_pole);
     printf("%d\n", vyhodnot_uzel(hra.zacatek, hra.velikost_pole, hra.souvisla_rada));
 
-    return 0;
+    return exit_value;
 }
 
 #endif
 // TEST MODULU
+
+
+/* neveřejné funkce */
 
 
 static bool pole_zapis(hra_uzel_t *uzel, unsigned velikost_pole, souradnice_t xy, hraci_t hrac)
@@ -46,7 +53,7 @@ static bool pole_zapis(hra_uzel_t *uzel, unsigned velikost_pole, souradnice_t xy
 
     // kontrola argumentů
     if (!uzel) {
-        chyby_log("Ukazatel nesmi byt NULL.", 0);
+        err_log("Ukazatel nesmi byt NULL.", 0);
         return false;
     }
     else if (   xy[0] < 0
@@ -54,15 +61,15 @@ static bool pole_zapis(hra_uzel_t *uzel, unsigned velikost_pole, souradnice_t xy
              || xy[0] >= velikost_pole
              || xy[1] >= velikost_pole
     ) {
-        chyby_log("Souradnice mimo herni plochu.", 0);
+        err_log("Souradnice mimo herni plochu.", 0);
         return false;
     }
     else if (offset < 0 || offset >= velikost_pole * velikost_pole) {
-        chyby_log("Zapis mimo pole.", 0);
+        err_log("Zapis mimo pole.", 0);
         return false;
     }
     else if (uzel->herni_pole[offset] != VOLNO) {
-        chyby_log("Herni pole je jiz obsazeno.", 0);
+        err_log("Herni pole je jiz obsazeno.", 0);
         return false;
     }
 
@@ -76,7 +83,7 @@ static hraci_t pole_precti(hra_uzel_t *uzel, unsigned velikost_pole, souradnice_
 
     // kontrola argumentů
     if (!uzel) {
-        chyby_log("Ukazatel nesmi byt NULL.", 0);
+        err_log("Ukazatel nesmi byt NULL.", 0);
         return false;
     }
     else if (   xy[0] < 0
@@ -84,11 +91,11 @@ static hraci_t pole_precti(hra_uzel_t *uzel, unsigned velikost_pole, souradnice_
              || xy[0] >= velikost_pole
              || xy[1] >= velikost_pole
     ) {
-        chyby_log("Souradnice mimo herni plochu.", 0);
+        err_log("Souradnice mimo herni plochu.", 0);
         return false;
     }
     else if (offset < 0 || offset >= velikost_pole * velikost_pole) {
-        chyby_log("Cteni mimo herni pole.", 0);
+        err_log("Cteni mimo herni pole.", 0);
         return false;
     }
     else if (uzel->herni_pole[offset] != HRAC_0 && uzel->herni_pole[offset] != HRAC_1) {
@@ -108,7 +115,7 @@ static void odehraj_uzel(hra_uzel_t* herni_uzel, unsigned velikost_pole)
 
     // kontrola argumentů
     if (!herni_uzel) {
-        chyby_log("Ukazatel nesmi byt NULL.", 0);
+        err_log("Ukazatel nesmi byt NULL.", 0);
         return;
     }
 
@@ -131,29 +138,12 @@ static stav_hry_t vyhodnot_uzel
 
     // kontrola argumentů
     if (!herni_uzel) {
-        chyby_log("Ukazatel nesmi byt NULL.", 0);
+        err_log("Ukazatel nesmi byt NULL.", 0);
         return PROBIHA;
     }
 
 
-    // řádky
-    for (unsigned radek = 0; radek < velikost_pole; radek++) {
-        symbol = pole_precti(herni_uzel, velikost_pole, (souradnice_t) { 0, radek });
-        for (unsigned sloupec = 1; sloupec < velikost_pole; sloupec++) {
-            cteny_symbol = pole_precti(herni_uzel, velikost_pole, (souradnice_t) { sloupec, radek });
-            if (symbol != VOLNO && symbol == cteny_symbol) {
-                vyskytu++;
-                if (vyskytu >= souvisla_rada) {
-                    goto konec_vyhodnot_uzel;
-                }
-            }
-            else if
-        }
-    }
-    // sloupce
-
-
-konec_vyhodnot_uzel:
+    
     return stav;
 }
 
@@ -163,7 +153,7 @@ bool tah(hra_strom_t* strom_hry)
     hra_uzel_t* aktualni_uzel = strom_hry->soucasna_pozice;
     // kontrola argumentů
     if (!strom_hry) {
-        chyby_log("Ukazatel nesmi byt NULL.", 0);
+        err_log("Ukazatel nesmi byt NULL.", 0);
         return false;
     }
 
@@ -176,7 +166,7 @@ bool tah(hra_strom_t* strom_hry)
         if ((aktualni_uzel->mozne_tahy[i]->mozne_tahy = (hra_uzel_t**) malloc(sizeof(void*) * aktualni_uzel->mozne_tahy[i]->pocet_moznych_tahu))
             == NULL)
         {
-            chyby_log("Zrejme dosla operacni pamet - herni pole", 0);
+            err_log("Zrejme dosla operacni pamet - herni pole", 0);
             uklid(strom_hry);
             exit(1);
         }
@@ -204,12 +194,12 @@ static hra_uzel_t* alokuj_uzel(hra_uzel_t* predchozi_uzel, unsigned velikost_pol
 
     // pokus o alokaci paměti pro nový node
     if ((novy_uzel = (hra_uzel_t*) malloc(sizeof(hra_uzel_t))) == NULL) {
-        chyby_log("Zrejme dosla operacni pamet - novy uzel.", 0);
+        err_log("Zrejme dosla operacni pamet - novy uzel.", 0);
         return NULL;
     }
     // pokus o alokaci paměti pro herní pole
     else if ((herni_pole = (herni_pole_t *) malloc(sizeof(herni_pole_t) * velikost_pole * velikost_pole)) == NULL) {
-        chyby_log("Zrejme dosla operacni pamet - herni pole", 0);
+        err_log("Zrejme dosla operacni pamet - herni pole", 0);
         free((void*) novy_uzel);
         novy_uzel = NULL;
         return NULL;
@@ -217,7 +207,7 @@ static hra_uzel_t* alokuj_uzel(hra_uzel_t* predchozi_uzel, unsigned velikost_pol
     // pokus o alokaci pole pro další tahy
     else if ((velikost_pole * velikost_pole) - zanoreni > 0) {
         if ((mozne_tahy = (hra_uzel_t **) malloc(sizeof(void*) * ((velikost_pole * velikost_pole) - zanoreni))) == NULL) {
-            chyby_log("Zrejme dosla operacni pamet - pole pro dalsi uzly", 0);
+            err_log("Zrejme dosla operacni pamet - pole pro dalsi uzly", 0);
             free((void *) novy_uzel);
             free((void *) herni_pole);
             novy_uzel = NULL;
@@ -255,7 +245,7 @@ static bool vymaz_node(hra_uzel_t* herni_uzel)
 {
     // kontrola argumentů
     if (!herni_uzel) {
-        chyby_log("Ukazatel na uzel nesmi byt NULL.", 0);
+        err_log("Ukazatel na uzel nesmi byt NULL.", 0);
         return false;
     }
 
@@ -297,24 +287,24 @@ bool inicializuj(
 
     // kontrola argumentů
     if (velikost_pole < 3) {
-        chyby_log("Velikost herniho pole nesmi byt < 3", 0);
+        err_log("Velikost herniho pole nesmi byt < 3", 0);
         return false;
     }
     else if (souvisla_rada > velikost_pole) {
-        chyby_log("Souvisla rada nemuze byt delsi nez herni pole.", 0);
+        err_log("Souvisla rada nemuze byt delsi nez herni pole.", 0);
         return false;
     }
     else if (!strom_hry) {
-        chyby_log("Ukazatel na strom nesmi byt NULL.", 0);
+        err_log("Ukazatel na strom nesmi byt NULL.", 0);
         return false;
     }
     else if (strom_hry->zacatek) {
-        chyby_log("Nastavte prvek { .zacatek } na NULL nebo "
+        err_log("Nastavte prvek { .zacatek } na NULL nebo "
                   "uvolnete jiz inicializovany strom.", 0);
         return false;
     }
     else if ((novy_uzel = alokuj_uzel(NULL, velikost_pole)) == NULL) {
-        chyby_log("Nelze vytvorit vstupni bod hry.", 0);
+        err_log("Nelze vytvorit vstupni bod hry.", 0);
         return false;
     }
 
@@ -339,7 +329,7 @@ void vypis_uzel(hra_uzel_t *uzel, unsigned velikost_pole)
 
     // kontrola argumentů
     if (!uzel) {
-        chyby_log("Ukazatel nesmi byt NULL.", 0);
+        err_log("Ukazatel nesmi byt NULL.", 0);
         return;
     }
 
@@ -391,11 +381,11 @@ bool uklid(hra_strom_t* hraStrom)
 {
     // kontrola argumentů
     if (!hraStrom) {
-        chyby_log("Ukazatel na strom nesmi byt NULL.", 0);
+        err_log("Ukazatel na strom nesmi byt NULL.", 0);
         return false;
     }
     else if (!(hraStrom->zacatek)) {
-        chyby_log("Strom hry neni inicializovan.", 0);
+        err_log("Strom hry neni inicializovan.", 0);
         return false;
     }
 

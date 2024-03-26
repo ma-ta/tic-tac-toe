@@ -4,9 +4,9 @@ CFLAGS=-Wall -Wextra -pedantic -g -fsanitize=address -std=c11
 LIBS=-lncursesw
 OUTPUT=bin
 .PHONY: run clean
-.DEFAULT_GOAL:=build
+.DEFAULT_GOAL:=all
 
-build: bin ${OUTPUT}/${TITLE}
+all: bin ${OUTPUT}/${TITLE}
 bin:
 	@mkdir bin
 
@@ -16,7 +16,7 @@ ${OUTPUT}/${TITLE}: ${OUTPUT}/main.o
 ${OUTPUT}/main.o: main.c global.h errors.h
 	@${CC} $< ${CFLAGS} -c -o $@
 
-run: build
+run: all
 	@./${OUTPUT}/${TITLE}
 
 clean:
