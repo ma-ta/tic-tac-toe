@@ -22,11 +22,24 @@ int main(void)
 {
     // initialization
     if (!program_init()) {
-        puts(_("The program cannot be started - will exit now..."));
+        puts(_("The program cannot be started and will exit now..."));
         return (exit_value = EXIT_FAILURE);
     }
 
-    
+    // PLAYGROUND
+    char buffer[1000] = "";
+    while(1) {
+        fgets(buffer, sizeof(buffer), stdin);
+        // trim the read string
+        buffer[strcspn(buffer, "\r\n")] = '\0';
+
+        if (strcmp("ahoj", buffer) == 0) {
+            puts("nazdar");
+        }
+        else if (strcmp("konec", buffer) == 0) {
+            break;
+        }
+    }
 
 
     return exit_value;

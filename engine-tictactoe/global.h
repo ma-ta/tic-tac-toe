@@ -7,6 +7,8 @@
 #include <stdbool.h>
 #include <locale.h>
 #include <libintl.h>
+#include <string.h>
+#include <ctype.h>
 #include <errno.h>
 #include "errors.h"
 

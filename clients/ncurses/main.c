@@ -22,7 +22,7 @@ int main(void)
     // initialization (ncurses...)
     if (!program_init()) {
         // ncurses not initialized
-        puts(_("The program cannot be started - will exit now..."));
+        puts(_("The program cannot be started and will exit now..."));
         return (exit_value = EXIT_FAILURE);
     }
 
