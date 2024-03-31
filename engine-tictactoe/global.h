@@ -13,15 +13,15 @@
 #include "errors.h"
 
 
-/* SYMBOLIC CONSTANTS */
+/* SYMBOLICKÉ KONSTANTY */
 
-#define ERRLOG_FILE  "errors.log"  // log file for errors
-#define LOCALE       ""  // set locale ("" => default)
+#define ERRLOG_FILE  "errors.log"  // soubor pro log chyb
+#define LOCALE       ""  // nastavení locale ("" => default)
 
 
-/* MACROS */
+/* MAKRA */
 
-#define _(STRING)  gettext(STRING)  // macro for gettext
+#define _(STRING)  gettext(STRING)  // makro pro gettext
 
 
 #endif // # GLOBAL_H

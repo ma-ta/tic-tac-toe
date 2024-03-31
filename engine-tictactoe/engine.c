@@ -24,7 +24,8 @@ static hraci_t pole_precti(hra_uzel_t *uzel, unsigned velikost_pole, souradnice_
 
 int exit_value = EXIT_SUCCESS;
 unsigned long long err_count = 0;
-bool err_log_on = true;
+
+static bool err_log_on = true;
 
 int main(void) {
 

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static int server_rw[2];  // file descriptors
+static int server_rw[2];  // souborové deskriptory
 
 void at_exit(void)
 {

@@ -1,9 +1,9 @@
 #ifndef ERRORS_H
 #define ERRORS_H
 
-extern int exit_value;                // return value of the program
-extern bool err_log_on;               // errors log on/off
-extern unsigned long long err_count;  // total count of errors during running the program
+extern int exit_value;                // návratová hodnota programu
+extern bool err_log_on;               // zap/vyp logování chyb
+extern unsigned long long err_count;  // celkový počet zalogovaných chyb od spuštění programu
 
 #define err_log(msg, stop) {  \
     exit_value = EXIT_FAILURE;  \
