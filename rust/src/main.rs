@@ -12,7 +12,8 @@ fn main() -> Result<(), String> {
 
     board.set(0, 0, Cell::Player2);
     board.set(1, 2, Cell::Player2);
-    board.set(3, 3, Cell::Player1);
+    board.set(3, 1, Cell::Player1);
+    board.set(3, board.get_size().1 - 1, Cell::Player1);
 
     board.print();
 

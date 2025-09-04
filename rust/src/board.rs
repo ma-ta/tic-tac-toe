@@ -6,7 +6,6 @@ use std::{
 #[derive(Debug, Clone)]
 pub struct Board {
     size: (usize, usize),
-    square: bool,
     cells: Cells,
 }
 
@@ -16,7 +15,6 @@ impl Board {
         if rows >= MIN_SIZE.0 && cols >= MIN_SIZE.1 {
             Ok(Self {
                 size: (rows, cols),
-                square: rows == cols,
                 cells: Cells::new(rows, cols),
             })
         } else {
@@ -34,12 +32,7 @@ impl Board {
     }
 
     pub fn is_empty(&self, row: usize, col: usize) -> bool {
-        if let Some(Cell::Empty) = self.get(row, col) {
-            true
-        }
-        else {
-            false
-        }
+        matches!(self.get(row, col), Some(Cell::Empty))
     }
 
     pub fn get(&self, row: usize, col: usize) -> Option<Cell> {
@@ -60,27 +53,28 @@ impl Board {
     }
 
     pub fn print(&self) {
-        println!("{}", self);
+        println!("{self}");
     }
 
     fn get_index(&self, row: usize, col: usize) -> usize {
-        row * self.size.0 + col
+        row * self.size.1 + col
     }
 }
 
 impl fmt::Display for Board {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut out = String::new();
+        let size = self.get_size();
 
-        for row in 0..self.get_size().0 {
-            out += &format!("{}+", "+----".repeat(self.get_size().0));
+        for row in 0..size.0 {
+            out += &format!("{}+", "+----".repeat(size.1));
             out += "\n|";
-        for col in 0..self.get_size().1 {
+        for col in 0..size.1 {
             out += &format!(" {} |", self.get(row, col).unwrap());
         }
         out += "\n";
     }
-        out += &format!("{}+", "+----".repeat(self.get_size().0));
+        out += &format!("{}+", "+----".repeat(self.size.1));
 
         write!(f, "{out}")
     }
