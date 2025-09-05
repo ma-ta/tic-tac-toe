@@ -11,7 +11,7 @@ pub struct Board {
 
 impl Board {
     pub fn new(rows: usize, cols: usize) -> Result<Self, String> {
-        const MIN_SIZE: (usize, usize) = (1, 3);
+        const MIN_SIZE: (usize, usize) = (3, 3);
         if rows >= MIN_SIZE.0 && cols >= MIN_SIZE.1 {
             Ok(Self {
                 size: (rows, cols),
@@ -27,6 +27,10 @@ impl Board {
         }
     }
 
+    pub fn clear(&mut self) {
+        self.cells.fill(Cell::Empty);
+    }
+
     pub fn get_size(&self) -> (usize, usize) {
         self.size
     }
@@ -36,19 +40,19 @@ impl Board {
     }
 
     pub fn get(&self, row: usize, col: usize) -> Option<Cell> {
-        let index = self.get_index(row, col);
-        
+        let index = self.idx(row, col);
+
         self.cells.get(index).copied()
     }
 
     pub fn set(&mut self, row: usize, col: usize, status: Cell) -> bool {
-        let index = self.get_index(row, col);
+        let index = self.idx(row, col);
 
         if let Some(cell) = self.cells.get_mut(index) {
             *cell = status;
             return true;
         }
-        
+
         false
     }
 
@@ -56,7 +60,7 @@ impl Board {
         println!("{self}");
     }
 
-    fn get_index(&self, row: usize, col: usize) -> usize {
+    fn idx(&self, row: usize, col: usize) -> usize {
         row * self.size.1 + col
     }
 }
@@ -69,11 +73,11 @@ impl fmt::Display for Board {
         for row in 0..size.0 {
             out += &format!("{}+", "+----".repeat(size.1));
             out += "\n|";
-        for col in 0..size.1 {
-            out += &format!(" {} |", self.get(row, col).unwrap());
+            for col in 0..size.1 {
+                out += &format!(" {} |", self.get(row, col).unwrap_or(Cell::Empty));
+            }
+            out += "\n";
         }
-        out += "\n";
-    }
         out += &format!("{}+", "+----".repeat(self.size.1));
 
         write!(f, "{out}")

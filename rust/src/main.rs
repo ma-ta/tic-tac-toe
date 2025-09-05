@@ -16,6 +16,8 @@ fn main() -> Result<(), String> {
     board.set(3, board.get_size().1 - 1, Cell::Player1);
 
     board.print();
+    board.clear();
+    board.print();
 
     Ok(())
 }
