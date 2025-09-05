@@ -67,6 +67,7 @@ impl Board {
 
 impl fmt::Display for Board {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        const SYMBOLS: (char, char, char) = ('\u{3000}', '⚪', '⚫');
         let mut out = String::new();
         let size = self.get_size();
 
@@ -74,7 +75,14 @@ impl fmt::Display for Board {
             out += &format!("{}+", "+----".repeat(size.1));
             out += "\n|";
             for col in 0..size.1 {
-                out += &format!(" {} |", self.get(row, col).unwrap_or(Cell::Empty));
+                out += &format!(
+                    " {} |",
+                    match self.get(row, col).unwrap_or(Cell::Empty) {
+                        Cell::Empty => SYMBOLS.0,
+                        Cell::Player1 => SYMBOLS.1,
+                        Cell::Player2 => SYMBOLS.2
+                    }
+                );
             }
             out += "\n";
         }
@@ -84,19 +92,19 @@ impl fmt::Display for Board {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub enum Cell {
     Empty,
     Player1, // X
     Player2, // O
 }
 
-impl fmt::Display for Cell {
+impl fmt::Debug for Cell {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let symbol = match self {
-            Cell::Empty => '\u{3000}',
-            Cell::Player1 => '⚪', // X (⚪)
-            Cell::Player2 => '⚫', // O (⚫)
+            Cell::Empty => '_',
+            Cell::Player1 => 'X',
+            Cell::Player2 => 'O',
         };
         write!(f, "{}", symbol)
     }
