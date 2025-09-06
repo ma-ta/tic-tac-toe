@@ -8,7 +8,10 @@ fn main() -> Result<(), String> {
     const BOARD_SIZE: usize = 4;
 
     let mut board =
-        Board::new(BOARD_SIZE, BOARD_SIZE)?;
+        match Board::new(BOARD_SIZE, BOARD_SIZE) {
+            Ok(board) => board,
+            Err(Error::MinSize(msg, _)) => return Err(msg)
+        };
 
     board.set(0, 0, Cell::Player2);
     board.set(1, 2, Cell::Player2);

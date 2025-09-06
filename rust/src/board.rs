@@ -1,7 +1,10 @@
 use std::{
-    fmt,
-    ops::{Deref, DerefMut},
+    fmt, ops::{Deref, DerefMut}
 };
+
+pub enum Error {
+    MinSize(String, (usize, usize)),
+}
 
 #[derive(Debug, Clone)]
 pub struct Board {
@@ -10,7 +13,7 @@ pub struct Board {
 }
 
 impl Board {
-    pub fn new(rows: usize, cols: usize) -> Result<Self, String> {
+    pub fn new(rows: usize, cols: usize) -> Result<Self, Error> {
         const MIN_SIZE: (usize, usize) = (3, 3);
         if rows >= MIN_SIZE.0 && cols >= MIN_SIZE.1 {
             Ok(Self {
@@ -18,10 +21,13 @@ impl Board {
                 cells: Cells::new(rows, cols),
             })
         } else {
-            Err(
-                format!(
-                    "Board size must be at least {}x{}",
-                    MIN_SIZE.0, MIN_SIZE.1
+            Err (
+                Error::MinSize(
+                    format!(
+                        "Board size must be at least {}x{}",
+                        MIN_SIZE.0, MIN_SIZE.1
+                    ),
+                    (MIN_SIZE.0, MIN_SIZE.1)
                 )
             )
         }
@@ -45,17 +51,15 @@ impl Board {
         self.cells.get(index).copied()
     }
 
-    // TODO: nesmí fungovat na obsazená políčka apod.
-    //       následně implementovat ++/-- volných políček v Board{}
-    //       asi vracet Result
     pub fn set(&mut self, row: usize, col: usize, status: Cell) -> bool {
         let index = self.idx(row, col);
 
         if let Some(cell) = self.cells.get_mut(index) {
-            *cell = status;
-            return true;
+            if *cell == Cell::Empty {
+                *cell = status;
+                return true
+            }
         }
-
         false
     }
 
@@ -92,7 +96,7 @@ impl fmt::Display for Board {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Cell {
     Empty,
     Player1, // X
