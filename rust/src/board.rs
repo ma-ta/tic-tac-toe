@@ -3,7 +3,7 @@ use std::{
 };
 
 pub enum Error {
-    MinSize(String, (usize, usize)),
+    MinSize(String),
 }
 
 #[derive(Debug, Clone)]
@@ -26,8 +26,7 @@ impl Board {
                     format!(
                         "Board size must be at least {}x{}",
                         MIN_SIZE.0, MIN_SIZE.1
-                    ),
-                    (MIN_SIZE.0, MIN_SIZE.1)
+                    )
                 )
             )
         }
@@ -41,8 +40,18 @@ impl Board {
         self.size
     }
 
-    pub fn is_empty(&self, row: usize, col: usize) -> bool {
-        matches!(self.get(row, col), Some(Cell::Empty))
+    pub fn is_empty(&self) -> bool {
+        if self.cells.iter().all(Cell::is_empty) {
+            return true;
+        }
+        false
+    }
+
+    pub fn is_cell_empty(&self, row: usize, col: usize) -> bool {
+        if let Some(cell) = self.get(row, col) {
+            return cell.is_empty()
+        }
+        false
     }
 
     pub fn get(&self, row: usize, col: usize) -> Option<Cell> {
@@ -101,6 +110,12 @@ pub enum Cell {
     Empty,
     Player1, // X
     Player2, // O
+}
+
+impl Cell {
+    pub fn is_empty(&self) -> bool {
+        *self == Cell::Empty
+    }
 }
 
 impl fmt::Debug for Cell {
