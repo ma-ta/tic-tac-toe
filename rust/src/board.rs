@@ -15,6 +15,7 @@ pub struct Board {
 impl Board {
     pub fn new(rows: usize, cols: usize) -> Result<Self, Error> {
         const MIN_SIZE: (usize, usize) = (3, 3);
+
         if rows >= MIN_SIZE.0 && cols >= MIN_SIZE.1 {
             Ok(Self {
                 size: (rows, cols),
@@ -60,6 +61,16 @@ impl Board {
         self.cells.get(index).copied()
     }
 
+    pub fn row_iter(&self, row: usize) -> impl Iterator<Item = &Cell> {
+        let start = row * self.size.1;
+        let end = start + self.size.1;
+        self.cells[start..end].iter()
+    }
+/*
+    pub fn col_iter(&self, row: usize) -> impl Iterator<Item = &Cell> {
+        
+    }
+*/
     pub fn set(&mut self, row: usize, col: usize, status: Cell) -> bool {
         let index = self.idx(row, col);
 
@@ -83,33 +94,32 @@ impl Board {
 
 impl fmt::Display for Board {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        const SYMBOLS: (char, char, char) = ('\u{3000}', '⚪', '⚫');
         let size = self.get_size();
 
         for row in 0..size.0 {
-            write!(f, "{}+\n|", "+----".repeat(size.1))?;
+            write!(f, "{}+\n|", "+---".repeat(size.1))?;
             for col in 0..size.1 {
                 write!(
                     f,
                     " {} |",
                     match self.get(row, col).unwrap_or(Cell::Empty) {
-                        Cell::Empty => SYMBOLS.0,
-                        Cell::Player1 => SYMBOLS.1,
-                        Cell::Player2 => SYMBOLS.2
+                        Cell::Empty => ' ',
+                        Cell::Player(0) => 'X',
+                        Cell::Player(1) => 'O',
+                        Cell::Player(n) => (n + b'0') as char
                     }
                 )?;
             }
             writeln!(f)?;
         }
-        write!(f, "{}+", "+----".repeat(self.size.1))
+        write!(f, "{}+", "+---".repeat(self.size.1))
     }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Cell {
     Empty,
-    Player1, // X
-    Player2, // O
+    Player(u8),
 }
 
 impl Cell {
@@ -122,8 +132,9 @@ impl fmt::Debug for Cell {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let symbol = match self {
             Cell::Empty => '_',
-            Cell::Player1 => 'X',
-            Cell::Player2 => 'O',
+            Cell::Player(0) => 'X',
+            Cell::Player(1) => 'O',
+            Cell::Player(n) => (*n + b'0') as char
         };
         write!(f, "{}", symbol)
     }
