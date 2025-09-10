@@ -12,6 +12,12 @@ pub struct Board {
     cells: Cells,
 }
 
+pub struct PrintSetup {
+    pub player_x_o: [char; 2],
+    pub empty: char,
+    pub border: &'static str
+}
+
 impl Board {
     pub fn new(rows: usize, cols: usize) -> Result<Self, Error> {
         const MIN_SIZE: (usize, usize) = (3, 3);
@@ -61,30 +67,49 @@ impl Board {
         self.cells.get(index).copied()
     }
 
-    pub fn row_iter(&self, row: usize) -> impl Iterator<Item = &Cell> {
+    pub fn row_iter(&mut self, row: usize) -> impl Iterator<Item = &mut Cell> {
         let start = row * self.size.1;
         let end = start + self.size.1;
-        self.cells[start..end].iter()
+        self.cells[start..end].iter_mut()
     }
-/*
-    pub fn col_iter(&self, row: usize) -> impl Iterator<Item = &Cell> {
-        
+
+    pub fn col_iter(&mut self, col: usize) -> impl Iterator<Item = &mut Cell> {
+        let start = col;
+        let end = self.size.0 + start;
+        self.cells[start..end].iter_mut().step_by(self.size.1)
     }
-*/
+
     pub fn set(&mut self, row: usize, col: usize, status: Cell) -> bool {
         let index = self.idx(row, col);
 
         if let Some(cell) = self.cells.get_mut(index) {
-            if *cell == Cell::Empty {
-                *cell = status;
-                return true
-            }
+            cell.set(status);
+            return true;
         }
         false
     }
 
-    pub fn print(&self) {
-        println!("{self}");
+    pub fn print(&self, setup: &PrintSetup) {
+        let size = self.get_size();
+        let mut out = String::new();
+
+        for row in 0..size.0 {
+            out += &format!("{}+\n|", setup.border.repeat(size.1));
+            for col in 0..size.1 {
+                out += &format!(
+                    " {} |",
+                    match self.get(row, col).unwrap_or(Cell::Empty) {
+                        Cell::Empty => setup.empty,
+                        Cell::Player(0) => setup.player_x_o[0],
+                        Cell::Player(1) => setup.player_x_o[1],
+                        Cell::Player(n) => (n + b'0' + 1) as char
+                    }
+                );
+            }
+            out += &"\n";
+        }
+        out += &format!("{}+", setup.border.repeat(self.size.1));
+        println!("{out}");
     }
 
     fn idx(&self, row: usize, col: usize) -> usize {
@@ -104,9 +129,7 @@ impl fmt::Display for Board {
                     " {} |",
                     match self.get(row, col).unwrap_or(Cell::Empty) {
                         Cell::Empty => ' ',
-                        Cell::Player(0) => 'X',
-                        Cell::Player(1) => 'O',
-                        Cell::Player(n) => (n + b'0') as char
+                        Cell::Player(n) => (n + b'0' + 1) as char
                     }
                 )?;
             }
@@ -126,15 +149,27 @@ impl Cell {
     pub fn is_empty(&self) -> bool {
         *self == Cell::Empty
     }
+
+    pub fn set(&mut self, status: Cell) -> bool {
+        if *self == Cell::Empty {
+            *self = status;
+            true
+        }
+        else {
+            false
+        }
+    }
+
+    pub fn get(&self) -> Cell {
+        *self
+    }
 }
 
 impl fmt::Debug for Cell {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let symbol = match self {
             Cell::Empty => '_',
-            Cell::Player(0) => 'X',
-            Cell::Player(1) => 'O',
-            Cell::Player(n) => (*n + b'0') as char
+            Cell::Player(n) => (*n + b'0' + 1) as char
         };
         write!(f, "{}", symbol)
     }
