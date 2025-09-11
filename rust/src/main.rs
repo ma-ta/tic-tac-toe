@@ -10,7 +10,7 @@ fn main() -> Result<(), String> {
     let print_setup = PrintSetup {
         player_x_o: ['⚪', '⚫'],
         empty: '\u{3000}',
-        border: "+----"
+        cell_width: 4
     };
 
     let mut board =

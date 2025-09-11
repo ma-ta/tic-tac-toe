@@ -15,7 +15,7 @@ pub struct Board {
 pub struct PrintSetup {
     pub player_x_o: [char; 2],
     pub empty: char,
-    pub border: &'static str
+    pub cell_width: u8
 }
 
 impl Board {
@@ -94,7 +94,9 @@ impl Board {
         let mut out = String::new();
 
         for row in 0..size.0 {
-            out += &format!("{}+\n|", setup.border.repeat(size.1));
+            out += "+";
+            out += &format!("{}+", "-".repeat(setup.cell_width as usize)).repeat(self.size.1);
+            out += "\n|";
             for col in 0..size.1 {
                 out += &format!(
                     " {} |",
@@ -106,9 +108,11 @@ impl Board {
                     }
                 );
             }
-            out += &"\n";
+            out += "\n";
         }
-        out += &format!("{}+", setup.border.repeat(self.size.1));
+        out += "+";
+        out += &format!("{}+", "-".repeat(setup.cell_width as usize)).repeat(self.size.1);
+
         println!("{out}");
     }
 
