@@ -6,7 +6,7 @@ pub enum Error {
     MinSize(String),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Board {
     size: (usize, usize),
     cells: Cells,
@@ -75,7 +75,7 @@ impl Board {
 
     pub fn col_iter(&mut self, col: usize) -> impl Iterator<Item = &mut Cell> {
         let start = col;
-        let end = self.size.0 + start;
+        let end = self.cells.len() - self.size.1 + 1 + col;
         self.cells[start..end].iter_mut().step_by(self.size.1)
     }
 
@@ -121,7 +121,7 @@ impl Board {
     }
 }
 
-impl fmt::Display for Board {
+impl fmt::Debug for Board {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let size = self.get_size();
 
@@ -133,7 +133,7 @@ impl fmt::Display for Board {
                     " {} |",
                     match self.get(row, col).unwrap_or(Cell::Empty) {
                         Cell::Empty => ' ',
-                        Cell::Player(n) => (n + b'0' + 1) as char
+                        Cell::Player(n) => (n + b'0') as char
                     }
                 )?;
             }
@@ -173,7 +173,7 @@ impl fmt::Debug for Cell {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let symbol = match self {
             Cell::Empty => '_',
-            Cell::Player(n) => (*n + b'0' + 1) as char
+            Cell::Player(n) => (*n + b'0') as char
         };
         write!(f, "{}", symbol)
     }
