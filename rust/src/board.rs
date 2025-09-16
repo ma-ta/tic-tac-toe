@@ -1,24 +1,36 @@
+//! A generic game board for tic-tac-toe and similar games.
+
 use std::{
     fmt, ops::{Deref, DerefMut}
 };
 
+/// Error types used by the board module.
 pub enum Error {
+    /// The board size is too small.
     MinSize(String),
 }
 
+/// A two-dimensional game board.
 #[derive(Clone)]
 pub struct Board {
+    /// Board dimensions: (rows, columns).
     size: (usize, usize),
+    /// Board cells stored in a 1D vector.
     cells: Cells,
 }
 
+/// Configuration for how the board is printed.
 pub struct PrintSetup {
+    /// Symbols for the two players (e.g. ['X', 'O']).
     pub player_x_o: [char; 2],
+    /// Symbol for empty cells.
     pub empty: char,
-    pub cell_width: u8
+    /// Width of each cell in characters.
+    pub cell_width: u8,
 }
 
 impl Board {
+    /// Creates a new game board with the given dimensions.
     pub fn new(rows: usize, cols: usize) -> Result<Self, Error> {
         const MIN_SIZE: (usize, usize) = (3, 3);
 
@@ -39,21 +51,22 @@ impl Board {
         }
     }
 
+    /// Resets all cells to empty.
     pub fn clear(&mut self) {
         self.cells.fill(Cell::Empty);
     }
 
+    /// Returns the board dimensions as (rows, columns).
     pub fn get_size(&self) -> (usize, usize) {
         self.size
     }
 
+    /// Returns `true` if all cells are empty.
     pub fn is_empty(&self) -> bool {
-        if self.cells.iter().all(Cell::is_empty) {
-            return true;
-        }
-        false
+        self.cells.iter().all(Cell::is_empty)
     }
 
+    /// Returns `true` if the given cell is empty.
     pub fn is_cell_empty(&self, row: usize, col: usize) -> bool {
         if let Some(cell) = self.get(row, col) {
             return cell.is_empty()
@@ -61,24 +74,29 @@ impl Board {
         false
     }
 
+    /// Returns the content of the given cell, or `None` if out of bounds.
     pub fn get(&self, row: usize, col: usize) -> Option<Cell> {
         let index = self.idx(row, col);
 
         self.cells.get(index).copied()
     }
 
+    /// Returns an iterator over the given row.
     pub fn row_iter(&mut self, row: usize) -> impl Iterator<Item = &mut Cell> {
         let start = row * self.size.1;
         let end = start + self.size.1;
         self.cells[start..end].iter_mut()
     }
 
+    /// Returns an iterator over the given column.
     pub fn col_iter(&mut self, col: usize) -> impl Iterator<Item = &mut Cell> {
         let start = col;
         let end = self.cells.len() - self.size.1 + 1 + col;
         self.cells[start..end].iter_mut().step_by(self.size.1)
     }
 
+    /// Attempts to set a cell to the given value.
+    /// Returns `true` if the operation succeeded.
     pub fn set(&mut self, row: usize, col: usize, status: Cell) -> bool {
         let index = self.idx(row, col);
 
@@ -89,6 +107,7 @@ impl Board {
         false
     }
 
+    /// Pretty-prints the board using the given setup.
     pub fn print(&self, setup: &PrintSetup) {
         let size = self.get_size();
         let mut out = String::new();
@@ -116,6 +135,7 @@ impl Board {
         println!("{out}");
     }
 
+    /// Converts a (row, col) pair into a 1D index.
     fn idx(&self, row: usize, col: usize) -> usize {
         row * self.size.1 + col
     }
@@ -143,9 +163,12 @@ impl fmt::Debug for Board {
     }
 }
 
+/// A single cell on the game board.
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Cell {
+    /// The cell is empty.
     Empty,
+    /// The cell is occupied by the given player (0 = first player, 1 = second, etc.).
     Player(u8),
 }
 
@@ -179,6 +202,7 @@ impl fmt::Debug for Cell {
     }
 }
 
+/// Internal wrapper around a 1D vector of cells.
 #[derive(Debug, Clone)]
 struct Cells(Vec<Cell>);
 
