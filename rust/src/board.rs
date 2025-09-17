@@ -21,8 +21,8 @@ pub struct Board {
 
 /// Configuration for how the board is printed.
 pub struct PrintSetup {
-    /// Symbols for the two players (e.g. ['X', 'O']).
-    pub player_x_o: [char; 2],
+    /// Symbols for the players (e.g. ['X', 'O']).
+    pub players: Vec<char>,
     /// Symbol for empty cells.
     pub empty: char,
     /// Width of each cell in characters.
@@ -121,9 +121,14 @@ impl Board {
                     " {} |",
                     match self.get(row, col).unwrap_or(Cell::Empty) {
                         Cell::Empty => setup.empty,
-                        Cell::Player(0) => setup.player_x_o[0],
-                        Cell::Player(1) => setup.player_x_o[1],
-                        Cell::Player(n) => (n + b'0' + 1) as char
+                        Cell::Player(n) => {
+                            if n as usize >= setup.players.len() {
+                                (n + b'0' + 1) as char
+                            }
+                            else {
+                                setup.players[n as usize]
+                            }
+                        }
                     }
                 );
             }
