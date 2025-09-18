@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
-mod board;  use std::cell;
+mod board;
+//mod rules;
 
 use board::*;
 
@@ -8,8 +9,7 @@ fn main() -> Result<(), String> {
     const BOARD_SIZE: usize = 4;
 
     let _print_setup = PrintSetup {
-        player_x_o: ['⚪', '⚫'],
-        empty: '\u{3000}',
+        players: vec!['⚪', '⚫'],
         cell_width: 4
     };
 
@@ -19,20 +19,10 @@ fn main() -> Result<(), String> {
             _ => return Err("Board::Error".to_string())
         };
 
-    let mut j = 0;
-    for i in 0..4 {
-        for cell in board.row_iter(i) {
-            *cell = Cell::Player(j);
-            j += 1;
-        }
-    }
+    board.set(1, 1, Cell::Player(0));
+    board.set(1, 2, Cell::Player(1));
 
-    println!("{board:?}");
-
-    let iter = board.col_iter(3);
-    for cell in iter {
-        println!("{cell:?}");
-    }
+    board.print(&_print_setup);
 
     Ok(())
 }

@@ -23,10 +23,8 @@ pub struct Board {
 pub struct PrintSetup {
     /// Symbols for the players (e.g. ['X', 'O']).
     pub players: Vec<char>,
-    /// Symbol for empty cells.
-    pub empty: char,
     /// Width of each cell in characters.
-    pub cell_width: u8,
+    pub cell_width: usize,
 }
 
 impl Board {
@@ -114,19 +112,22 @@ impl Board {
 
         for row in 0..size.0 {
             out += "+";
-            out += &format!("{}+", "-".repeat(setup.cell_width as usize)).repeat(self.size.1);
+            out += &format!("{}+", "-".repeat(setup.cell_width)).repeat(self.size.1);
             out += "\n|";
             for col in 0..size.1 {
                 out += &format!(
                     " {} |",
                     match self.get(row, col).unwrap_or(Cell::Empty) {
-                        Cell::Empty => setup.empty,
+                        Cell::Empty => {
+                            " ".repeat(setup.cell_width / 2)
+                        },
                         Cell::Player(n) => {
                             if n as usize >= setup.players.len() {
-                                (n + b'0' + 1) as char
+                                ((n + b'0' + 1) as char).to_string()
+                                + &" ".repeat(setup.cell_width - 3)
                             }
                             else {
-                                setup.players[n as usize]
+                                setup.players[n as usize].to_string()
                             }
                         }
                     }
@@ -135,7 +136,7 @@ impl Board {
             out += "\n";
         }
         out += "+";
-        out += &format!("{}+", "-".repeat(setup.cell_width as usize)).repeat(self.size.1);
+        out += &format!("{}+", "-".repeat(setup.cell_width)).repeat(self.size.1);
 
         println!("{out}");
     }
