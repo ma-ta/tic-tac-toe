@@ -27,6 +27,16 @@ pub struct PrintSetup {
     pub cell_width: usize,
 }
 
+/// Returns a new PrintSetup with default values
+impl Default for PrintSetup {
+    fn default() -> Self {
+        Self {
+            players: vec!['⚪', '⚫'],
+            cell_width: 4
+        }
+    }
+}
+
 impl Board {
     /// Creates a new game board with the given dimensions.
     pub fn new(rows: usize, cols: usize) -> Result<Self, Error> {
