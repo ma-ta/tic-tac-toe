@@ -90,17 +90,33 @@ impl Board {
     }
 
     /// Returns an iterator over the given row.
-    pub fn row_iter(&mut self, row: usize) -> impl Iterator<Item = &mut Cell> {
+    pub fn row_iter(&self, row: usize) -> impl Iterator<Item = &Cell> {
         let start = row * self.size.1;
         let end = start + self.size.1;
-        self.cells[start..end].iter_mut()
+        self.cells[start..end].iter()
     }
 
     /// Returns an iterator over the given column.
-    pub fn col_iter(&mut self, col: usize) -> impl Iterator<Item = &mut Cell> {
-        let start = col;
-        let end = self.cells.len() - self.size.1 + 1 + col;
-        self.cells[start..end].iter_mut().step_by(self.size.1)
+    pub fn col_iter(&self, col: usize) -> impl Iterator<Item = &Cell> {
+        self.cells[col..].iter().step_by(self.size.1)
+    }
+
+    /// Returns a vector of all rows
+    pub fn all_rows(&self) -> Vec<Vec<Cell>> {
+        let mut ret: Vec<Vec<_>> = Vec::new();
+        for row in 0..self.size.0 {
+            ret.push(self.row_iter(row).copied().collect());
+        }
+        ret
+    }
+
+    /// Returns a vector of all columns
+    pub fn all_colls(&self) -> Vec<Vec<Cell>> {
+        let mut ret: Vec<Vec<_>> = Vec::new();
+        for col in 0..self.size.1 {
+            ret.push(self.col_iter(col).copied().collect());
+        }
+        ret
     }
 
     /// Attempts to set a cell to the given value.
