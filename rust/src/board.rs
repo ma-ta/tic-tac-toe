@@ -209,14 +209,8 @@ impl Cell {
         *self == Cell::Empty
     }
 
-    pub fn set(&mut self, status: Cell) -> bool {
-        if *self == Cell::Empty {
-            *self = status;
-            true
-        }
-        else {
-            false
-        }
+    pub fn set(&mut self, status: Cell) {
+        *self = status;
     }
 
     pub fn get(&self) -> Cell {
