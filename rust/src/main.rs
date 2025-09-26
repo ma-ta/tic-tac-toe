@@ -35,5 +35,9 @@ fn main() -> Result<(), String> {
     board_vec = board.all_colls();
     println!("sloupce:\n{board_vec:?}");
 
+    let iter = board.diag_iter((1, 1));
+    let cells: Vec<_> = iter.collect();
+    println!("{cells:?}");
+
     Ok(())
 }

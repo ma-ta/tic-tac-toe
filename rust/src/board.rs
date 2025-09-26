@@ -5,6 +5,7 @@ use std::{
 };
 
 /// Error types used by the board module.
+#[derive(Debug)]
 pub enum Error {
     /// The board size is too small.
     MinSize(String),
@@ -34,6 +35,13 @@ impl Default for PrintSetup {
             players: vec!['⚪', '⚫'],
             cell_width: 4
         }
+    }
+}
+
+/// Creates a new game board with the default `(3 × 3)` dimensions.
+impl Default for Board {
+    fn default() -> Self {
+        Board::new(3, 3).unwrap()
     }
 }
 
@@ -101,6 +109,31 @@ impl Board {
         self.cells[col..].iter().step_by(self.size.1)
     }
 
+    /// Returns an iterator over the given diagonal
+    /// (direction x + 1, y + 1).
+    pub fn diag_iter(
+        &self,
+        mut pos: (usize, usize)) -> impl Iterator<Item = &Cell>
+    {
+        let mut cells = Vec::new();
+
+        while pos.0 < self.size.0 && pos.1 < self.size.1 {
+            let index = self.idx(pos.0, pos.1);
+            cells.push(self.cells.get(index).unwrap());
+
+            pos.0 += 1;
+            pos.1 += 1;
+        }
+
+        cells.into_iter()
+    }
+
+    /*
+    pub fn all_diags(&self) -> Vec<Vec<Cell>> {
+
+    }
+    */
+
     /// Returns a vector of all rows
     pub fn all_rows(&self) -> Vec<Vec<Cell>> {
         let mut ret: Vec<Vec<_>> = Vec::new();
@@ -113,6 +146,7 @@ impl Board {
     /// Returns a vector of all columns
     pub fn all_colls(&self) -> Vec<Vec<Cell>> {
         let mut ret: Vec<Vec<_>> = Vec::new();
+
         for col in 0..self.size.1 {
             ret.push(self.col_iter(col).copied().collect());
         }
