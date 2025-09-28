@@ -82,6 +82,11 @@ impl Board {
         self.cells.iter().all(Cell::is_empty)
     }
 
+    /// Returns `true` if all cells are full.
+    pub fn is_full(&self) -> bool {
+        !self.cells.iter().any(Cell::is_empty)
+    }
+
     /// Returns `true` if the given cell is empty.
     pub fn is_cell_empty(&self, row: usize, col: usize) -> bool {
         if let Some(cell) = self.get(row, col) {
@@ -91,66 +96,10 @@ impl Board {
     }
 
     /// Returns the content of the given cell, or `None` if out of bounds.
-    pub fn get(&self, row: usize, col: usize) -> Option<Cell> {
+    pub fn get(&self, row: usize, col: usize) -> Option<&Cell> {
         let index = self.idx(row, col);
 
-        self.cells.get(index).copied()
-    }
-
-    /// Returns an iterator over the given row.
-    pub fn row_iter(&self, row: usize) -> impl Iterator<Item = &Cell> {
-        let start = row * self.size.1;
-        let end = start + self.size.1;
-        self.cells[start..end].iter()
-    }
-
-    /// Returns an iterator over the given column.
-    pub fn col_iter(&self, col: usize) -> impl Iterator<Item = &Cell> {
-        self.cells[col..].iter().step_by(self.size.1)
-    }
-
-    /// Returns an iterator over the given diagonal
-    /// (direction x + 1, y + 1).
-    pub fn diag_iter(
-        &self,
-        mut pos: (usize, usize)) -> impl Iterator<Item = &Cell>
-    {
-        let mut cells = Vec::new();
-
-        while pos.0 < self.size.0 && pos.1 < self.size.1 {
-            let index = self.idx(pos.0, pos.1);
-            cells.push(self.cells.get(index).unwrap());
-
-            pos.0 += 1;
-            pos.1 += 1;
-        }
-
-        cells.into_iter()
-    }
-
-    /*
-    pub fn all_diags(&self) -> Vec<Vec<Cell>> {
-
-    }
-    */
-
-    /// Returns a vector of all rows
-    pub fn all_rows(&self) -> Vec<Vec<Cell>> {
-        let mut ret: Vec<Vec<_>> = Vec::new();
-        for row in 0..self.size.0 {
-            ret.push(self.row_iter(row).copied().collect());
-        }
-        ret
-    }
-
-    /// Returns a vector of all columns
-    pub fn all_colls(&self) -> Vec<Vec<Cell>> {
-        let mut ret: Vec<Vec<_>> = Vec::new();
-
-        for col in 0..self.size.1 {
-            ret.push(self.col_iter(col).copied().collect());
-        }
-        ret
+        self.cells.get(index)
     }
 
     /// Attempts to set a cell to the given value.
@@ -165,6 +114,82 @@ impl Board {
         false
     }
 
+    /// Returns an iterator over the given row.
+    pub fn row_iter(&self, row: usize) -> impl Iterator<Item = &Cell> {
+        let start = row * self.size.1;
+        let end = start + self.size.1;
+        self.cells[start..end].iter()
+    }
+
+    /// Returns a vector of all rows.
+    pub fn all_rows(&self) -> Vec<Vec<&Cell>> {
+        let mut ret: Vec<Vec<_>> = Vec::new();
+        for row in 0..self.size.0 {
+            ret.push(self.row_iter(row).collect());
+        }
+        ret
+    }
+
+    /// Returns an iterator over the given column.
+    pub fn col_iter(&self, col: usize) -> impl Iterator<Item = &Cell> {
+        self.cells[col..].iter().step_by(self.size.1)
+    }
+
+    /// Returns a vector of all columns.
+    pub fn all_cols(&self) -> Vec<Vec<&Cell>> {
+        let mut ret: Vec<Vec<_>> = Vec::new();
+
+        for col in 0..self.size.1 {
+            ret.push(self.col_iter(col).collect());
+        }
+        ret
+    }
+
+    /// Returns an iterator over the given diagonal.
+    /// `pos` - start position (cell)
+    /// `rev` - from right to left diagonal
+    pub fn diag_iter(
+        &self,
+        pos: (usize, usize),
+        rev: bool) -> impl Iterator<Item = &Cell>
+    {
+        let start = self.idx(pos.0, pos.1);
+        let mut end = pos;
+
+        if !rev {
+            while end.0 + 1 < self.size.0 && end.1 + 1 < self.size.1 {
+                end.0 += 1;
+                end.1 += 1;
+            }
+            let end = self.idx(end.0, end.1);
+            return self.cells[start..=end].iter().step_by(self.size.1 + 1);
+        }
+        else {
+            while end.0 + 1 < self.size.0 && end.1 as isize - 1 >= 0 {
+                end.0 += 1;
+                end.1 -= 1;
+            }
+            let end = self.idx(end.0, end.1);
+            return self.cells[start..=end].iter().step_by(self.size.1 - 1);
+        }
+    }
+
+    /// Returns a vector of all diagonals.
+    pub fn all_diags(&self) -> Vec<Vec<&Cell>> {
+        let mut cells = Vec::new();
+
+        for pos in 0..self.size.0 {
+            cells.push(self.diag_iter((pos, 0), false).collect());
+            cells.push(self.diag_iter((pos, self.size.1 - 1), true).collect());
+        }
+        for pos in 1..self.size.1 {
+            cells.push(self.diag_iter((0, pos), false).collect());
+            cells.push(self.diag_iter((0, pos), true).collect());
+        }
+
+        cells
+    }
+
     /// Pretty-prints the board using the given setup.
     pub fn print(&self, setup: &PrintSetup) {
         let size = self.get_size();
@@ -177,7 +202,7 @@ impl Board {
             for col in 0..size.1 {
                 out += &format!(
                     " {} |",
-                    match self.get(row, col).unwrap_or(Cell::Empty) {
+                    match *(self.get(row, col).unwrap_or(&Cell::Empty)) {
                         Cell::Empty => {
                             " ".repeat(setup.cell_width / 2)
                         },
@@ -201,6 +226,8 @@ impl Board {
         println!("{out}");
     }
 
+    /* PRIVATE */
+
     /// Converts a (row, col) pair into a 1D index.
     fn idx(&self, row: usize, col: usize) -> usize {
         row * self.size.1 + col
@@ -217,7 +244,7 @@ impl fmt::Debug for Board {
                 write!(
                     f,
                     " {} |",
-                    match self.get(row, col).unwrap_or(Cell::Empty) {
+                    match *(self.get(row, col).unwrap_or(&Cell::Empty)) {
                         Cell::Empty => ' ',
                         Cell::Player(n) => (n + b'0') as char
                     }

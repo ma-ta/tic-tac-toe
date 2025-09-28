@@ -14,30 +14,22 @@ fn main() -> Result<(), String> {
             Err(_) => return Err("Board::Error".to_string())
         };
 
-    board.set(0, 3, Cell::Player(0));
-    board.set(1, 1, Cell::Player(0));
-    board.set(1, 2, Cell::Player(1));
-    board.set(3, 3, Cell::Player(1));
-
-    let mut board_vec: Vec<_> = board.row_iter(1).collect();
-    println!("řádek 1: {board_vec:?}");
-    board_vec = board.row_iter(3).collect();
-    println!("řádek 3: {board_vec:?}");
-    board_vec = board.col_iter(0).collect();
-    println!("sloupec 0: {board_vec:?}");
-    board_vec = board.col_iter(3).collect();
-    println!("sloupec 3: {board_vec:?}");
+    let mut count = 0;
+    for row in 0..board.get_size().0 {
+        for col in 0..board.get_size().1 {
+            board.set(row, col, Cell::Player(count));
+            count += 1;
+        }
+    }
 
     println!("{board:?}");
 
-    let mut board_vec = board.all_rows();
-    println!("řádky:\n{board_vec:?}");
-    board_vec = board.all_colls();
-    println!("sloupce:\n{board_vec:?}");
-
-    let iter = board.diag_iter((1, 1));
-    let cells: Vec<_> = iter.collect();
-    println!("{cells:?}");
+    let rows = board.all_rows();
+    let cols = board.all_cols();
+    let diags = board.all_diags();
+    println!("rows:\n{rows:?}");
+    println!("cols:\n{cols:?}");
+    println!("diags:\n{diags:?}");
 
     Ok(())
 }
