@@ -3,7 +3,7 @@
 use super::*;
 
 /// Actual game state.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum GameState {
     Win(u8),
     Draw,
@@ -50,7 +50,7 @@ impl Board {
         let mut lines = self.all_rows();
         lines.extend(self.all_cols());
         lines.extend(self.all_diags());
-    
+
         for line in lines {
             let mut count = 0;
             let mut last_player: Option<u8> = None;
