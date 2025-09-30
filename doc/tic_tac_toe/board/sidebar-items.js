@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Cell","Error"],"mod":["rules"],"struct":["Board","Cells","PrintSetup"]};
