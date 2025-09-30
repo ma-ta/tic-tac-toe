@@ -77,6 +77,11 @@ impl Board {
         self.size
     }
 
+    /// Returns the board as 1D vector of cell states.
+    pub fn get_cells(&self) -> &Vec<Cell> {
+        &self.cells
+    }
+
     /// Returns `true` if all cells are empty.
     pub fn is_empty(&self) -> bool {
         self.cells.iter().all(Cell::is_empty)
