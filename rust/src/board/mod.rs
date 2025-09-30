@@ -1,8 +1,9 @@
 //! A generic game board for tic-tac-toe and similar games.
 
-use std::{
-    fmt, ops::{Deref, DerefMut}
-};
+pub mod rules;
+
+//pub use rules::*;
+use std::{ fmt, ops::{Deref, DerefMut} };
 
 /// Error types used by the board module.
 #[derive(Debug)]
@@ -82,6 +83,11 @@ impl Board {
         &self.cells
     }
 
+    /// Returns the board as 1D mut vector of cell states.
+    pub fn get_cells_mut(&mut self) -> &mut Vec<Cell> {
+        &mut self.cells
+    }
+
     /// Returns `true` if all cells are empty.
     pub fn is_empty(&self) -> bool {
         self.cells.iter().all(Cell::is_empty)
@@ -100,11 +106,18 @@ impl Board {
         false
     }
 
-    /// Returns the content of the given cell, or `None` if out of bounds.
+    /// Returns the reference of the given cell, or `None` if out of bounds.
     pub fn get(&self, row: usize, col: usize) -> Option<&Cell> {
         let index = self.idx(row, col);
 
         self.cells.get(index)
+    }
+
+    /// Returns the mut reference of the given cell, or `None` if out of bounds.
+    pub fn get_mut(&mut self, row: usize, col: usize) -> Option<&mut Cell> {
+        let index = self.idx(row, col);
+
+        self.cells.get_mut(index)
     }
 
     /// Attempts to set a cell to the given value.
@@ -231,8 +244,8 @@ impl Board {
         println!("{out}");
     }
 
-    /// Some simple tests
-    pub fn test(size: (usize, usize)) -> Result<(), String> {
+    /// Some simple tests.
+    pub fn test_board(size: (usize, usize)) -> Result<(), String> {
         let mut _print_setup = PrintSetup::default();
         let mut board =
             match Board::new(size.0, size.1) {
@@ -301,6 +314,10 @@ pub enum Cell {
 impl Cell {
     pub fn is_empty(&self) -> bool {
         *self == Cell::Empty
+    }
+
+    pub fn empty(&mut self) {
+        *self = Cell::Empty;
     }
 
     pub fn set(&mut self, status: Cell) {
