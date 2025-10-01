@@ -41,7 +41,7 @@ fn main() {
         print!("{pos:?} ");
         if game.turn(pos) {println!("ok")} else {println!("err")};
         if game.current_turn() == 0 {
-            thread::sleep(Duration::from_secs(2));
+            thread::sleep(Duration::from_secs(3));
         }
         match game.state() {
             GameState::Draw => {
