@@ -1,7 +1,7 @@
 mod board;
 
 use board::*;
-pub use board::{PrintSetup, rules::GameState};
+pub use board::{PrintSetup, rules::GameState, Board};
 
 #[derive(Debug, Clone)]
 pub struct Game {
