@@ -1,3 +1,5 @@
+//! Prototype for testing the game only
+
 #![allow(dead_code)]
 
 mod game;
