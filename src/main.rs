@@ -9,20 +9,21 @@ use std::{thread, time::Duration};
 
 
 fn main() {
+    const PAUSE: u64 = 2;
     let mut game = Game::default();
     let mut input = String::new();
     let mut rng = rand::rng();
 
     loop {
         print!("\x1B[2J\x1B[H");
-        game.board().print(&PrintSetup { ..Default::default() });
-        print!("Player {} (row col) > ", game.current_turn());
+        game.get_board().print(&PrintSetup { ..Default::default() });
+        print!("Player {} (row col) > ", game.get_current_turn());
         let _ = io::stdout().flush();
         let pos: (usize, usize);
 
-        if game.current_turn() != 0 {
+        if game.get_current_turn() != 0 {
             let moves
-                = game.board().get_legal_moves().unwrap();
+                = rules::get_legal_moves(&game.get_board()).unwrap();
             pos = moves[rng.random_range(0..moves.len())];
         }
         else {
@@ -40,19 +41,19 @@ fn main() {
 
         print!("{pos:?} ");
         if game.turn(pos) {println!("ok")} else {println!("err")};
-        if game.current_turn() == 0 {
-            thread::sleep(Duration::from_secs(3));
+        if game.get_current_turn() == 0 {
+            thread::sleep(Duration::from_secs(PAUSE));
         }
-        match game.state() {
+        match game.get_state() {
             GameState::Draw => {
                 print!("\x1B[2J\x1B[H");
-                game.board().print(&PrintSetup { ..Default::default() });
+                game.get_board().print(&PrintSetup { ..Default::default() });
                 println!("It's a draw!");
                 break;
             }
             GameState::Win(player) => {
                 print!("\x1B[2J\x1B[H");
-                game.board().print(&PrintSetup { ..Default::default() });
+                game.get_board().print(&PrintSetup { ..Default::default() });
                 println!("Player {} won!", player);
                 break;
             }

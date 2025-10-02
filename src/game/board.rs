@@ -1,8 +1,5 @@
 //! A generic game board for tic-tac-toe and similar games.
 
-pub mod rules;
-
-//pub use rules::*;
 use std::{ fmt, ops::{Deref, DerefMut} };
 
 /// Error types used by the board module.

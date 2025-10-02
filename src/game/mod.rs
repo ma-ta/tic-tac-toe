@@ -1,9 +1,11 @@
 //! Tic-Tac-Toe game module
 
-mod board;
+pub mod board;
+pub mod rules;
 
-use board::*;
-pub use board::{PrintSetup, rules::GameState, Board};
+use board::{Cell};
+pub use board::{PrintSetup, Board};
+pub use rules::{GameState};
 
 /// Instance of a Tic-Tac-Toe game.
 #[derive(Debug, Clone)]
@@ -36,12 +38,12 @@ impl Game {
     }
 
     /// Returns a reference to the board of this game.
-    pub fn board(&self) -> &Board {
+    pub fn get_board(&self) -> &Board {
         &self.board
     }
 
     /// Returns the player whose turn it is.
-    pub fn current_turn(&self) -> u8 {
+    pub fn get_current_turn(&self) -> u8 {
         self.current_turn
     }
 
@@ -57,10 +59,10 @@ impl Game {
     /// Returns `true` if the move was successful.
     pub fn turn(&mut self, pos: (usize, usize)) -> bool {
         if let GameState::InProgress = self.state {
-            if self.board.make_move(pos, Cell::Player(self.current_turn)) {
+            if self.make_move(pos, Cell::Player(self.current_turn)) {
                 self.current_turn = if self.current_turn >= self.players - 1 { 0 }
                                     else { self.current_turn + 1 };
-                self.state = self.board.check_state(self.sequence);
+                self.state = rules::check_state(&self.board, self.sequence);
                 return true
             }
         }
@@ -69,8 +71,20 @@ impl Game {
     }
 
     /// Returns the current game state.
-    pub fn state(&self) -> GameState {
+    pub fn get_state(&self) -> GameState {
         self.state.clone()
+    }
+
+    /* PRIVATE */
+
+    /// Tries to make a move.
+    fn make_move(&mut self, pos: (usize, usize), val: Cell) -> bool {
+        if rules::is_legal_move(&self.board, pos) {
+            self.board.set(pos.0, pos.1, val)
+        }
+        else {
+            false
+        }
     }
 }
 
