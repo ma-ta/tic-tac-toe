@@ -9,15 +9,22 @@ use std::{thread, time::Duration};
 
 
 fn main() {
-    const PAUSE: u64 = 2;
+    let title = format!(
+        "{0}\n{1}\n{0}\n{2}\n{0}\n",
+        "+-------------------------------+",
+        "| Tic Tac Toe Prototype in Rust |",
+        "| (c) 2025  by Ma-TA            |",
+    );
+    const PAUSE: u64 = 3;
     let mut game = Game::default();
     let mut input = String::new();
     let mut rng = rand::rng();
 
     loop {
         print!("\x1B[2J\x1B[H");
+        println!("{title}");
         game.get_board().print(&PrintSetup { ..Default::default() });
-        print!("Player {} (row col) > ", game.get_current_turn());
+        print!("PLAYER [{}]\n(row col) > ", game.get_current_turn());
         let _ = io::stdout().flush();
         let pos: (usize, usize);
 
@@ -39,22 +46,24 @@ fn main() {
             input.clear();
         }
 
-        print!("{pos:?} ");
-        if game.turn(pos) {println!("ok")} else {println!("err")};
+        print!("{} {} => ", pos.0, pos.1);
+        if game.turn(pos) {println!("OK")} else {println!("ERR!")};
         if game.get_current_turn() == 0 {
             thread::sleep(Duration::from_secs(PAUSE));
         }
         match game.get_state() {
             GameState::Draw => {
                 print!("\x1B[2J\x1B[H");
+                println!("{title}");
                 game.get_board().print(&PrintSetup { ..Default::default() });
-                println!("It's a draw!");
+                println!("It's a draw!\n");
                 break;
             }
             GameState::Win(player) => {
                 print!("\x1B[2J\x1B[H");
+                println!("{title}");
                 game.get_board().print(&PrintSetup { ..Default::default() });
-                println!("Player {} won!", player);
+                println!("Player {} won!\n", player);
                 break;
             }
             _ => continue
