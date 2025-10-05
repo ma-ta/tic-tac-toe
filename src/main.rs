@@ -20,12 +20,12 @@ fn main() {
     );
     const PAUSE: u64 = 3;
     let mut game = Game::default();
-    let mut input = String::new();
     let mut rng = rand::rng();
 
     loop {
         print!("\x1B[2J\x1B[H");
         println!("{title}");
+        println!("(Ctrl+C to quit)\n");
         game.get_board().print(&PrintSetup { ..Default::default() });
         print!("> PLAYER: {} <\n(row col) > ", game.get_current_turn());
         let _ = io::stdout().flush();
@@ -37,30 +37,43 @@ fn main() {
             pos = moves[rng.random_range(0..moves.len())];
         }
         else {
+            let mut input = String::new();
+            let mut nums: [usize; 2] = [0, 0];
+
+            'io_input:
             loop {
                 input.clear();
                 io::stdin().read_line(&mut input).expect("Failed to read line");
                 let mut iter = input
                     .trim()
-                    .split_whitespace() 
-                    .map(|s| s.parse::<usize>());
+                    .split_whitespace()
+                    .map(|x| x.parse::<usize>());
 
-                match iter.next().unwrap() {
-                    Ok(n) => pos.0 = n,
-                    _ => {
-                        println!("(!) Enter two numbers (e.g. 0 1) >");
-                        continue
-                    }
-                }
-                match iter.next().unwrap() {
-                    Ok(n) => pos.1 = n,
-                    _ => {
-                        println!("(!) Enter two numbers (e.g. 2 0) >");
-                        continue
+                for i in 0..nums.len() {
+                    match iter.next() {
+                        None => {
+                            print!("Enter two numbers (e.g. 1 1) > ");
+                            let _ = io::stdout().flush();
+                            continue 'io_input;
+                        }
+                        Some(num) => {
+                            match num {
+                                Err(_) => {
+                                    print!("Enter numbers only (e.g. 1 1) > ");
+                                    let _ = io::stdout().flush();
+                                    continue 'io_input;
+                                }
+                                Ok(n) => {
+                                    nums[i] = n;
+                                }
+                            }
+                        }
                     }
                 }
                 break;
             }
+            pos.0 = nums[0];
+            pos.1 = nums[1];
         }
 
         print!("{} {} => ", pos.0, pos.1);
