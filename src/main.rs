@@ -9,13 +9,14 @@ use rand::Rng;
 use std::io::{self, Write};
 use std::{thread, time::Duration};
 
-
 fn main() {
     let title = format!(
-        "{0}\n{1}\n{0}\n{2}\n{0}\n",
+        "{}\n{}\n{}\n{}\n{}\n",
         "+-------------------------------+",
         "| Tic Tac Toe Prototype in Rust |",
+        "+-------------------------------+",
         "| (c) 2025  by Ma-TA            |",
+        "+-------------------------------+"
     );
     const PAUSE: u64 = 3;
     let mut game = Game::default();
@@ -26,9 +27,9 @@ fn main() {
         print!("\x1B[2J\x1B[H");
         println!("{title}");
         game.get_board().print(&PrintSetup { ..Default::default() });
-        print!("PLAYER [{}]\n(row col) > ", game.get_current_turn());
+        print!("> PLAYER: {} <\n(row col) > ", game.get_current_turn());
         let _ = io::stdout().flush();
-        let pos: (usize, usize);
+        let mut pos: (usize, usize) = (0, 0);
 
         if game.get_current_turn() != 0 {
             let moves
@@ -36,16 +37,30 @@ fn main() {
             pos = moves[rng.random_range(0..moves.len())];
         }
         else {
-            io::stdin().read_line(&mut input).expect("Failed to read line");
-            pos = {
+            loop {
+                input.clear();
+                io::stdin().read_line(&mut input).expect("Failed to read line");
                 let mut iter = input
                     .trim()
                     .split_whitespace() 
-                    .map(|s| s.parse::<usize>().expect("Invalid number"));
+                    .map(|s| s.parse::<usize>());
 
-                (iter.next().unwrap(), iter.next().unwrap())
-            };
-            input.clear();
+                match iter.next().unwrap() {
+                    Ok(n) => pos.0 = n,
+                    _ => {
+                        println!("(!) Enter two numbers (e.g. 0 1) >");
+                        continue
+                    }
+                }
+                match iter.next().unwrap() {
+                    Ok(n) => pos.1 = n,
+                    _ => {
+                        println!("(!) Enter two numbers (e.g. 2 0) >");
+                        continue
+                    }
+                }
+                break;
+            }
         }
 
         print!("{} {} => ", pos.0, pos.1);
