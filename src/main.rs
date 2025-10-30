@@ -18,7 +18,7 @@ fn main() {
         "| (c) 2025  by Ma-TA            |",
         "+-------------------------------+"
     );
-    const PAUSE: u64 = 3;
+    const PAUSE: u64 = 2;
     let mut game = Game::default();
     let mut rng = rand::rng();
 
@@ -86,14 +86,14 @@ fn main() {
                 print!("\x1B[2J\x1B[H");
                 println!("{title}");
                 game.get_board().print(&PrintSetup { ..Default::default() });
-                println!("It's a draw!\n");
+                println!("IT'S A DRAW!\n");
                 break;
             }
             GameState::Win(player) => {
                 print!("\x1B[2J\x1B[H");
                 println!("{title}");
                 game.get_board().print(&PrintSetup { ..Default::default() });
-                println!("Player {} won!\n", player);
+                println!("PLAYER {} WON!\n", player);
                 break;
             }
             _ => continue
