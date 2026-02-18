@@ -1,5 +1,6 @@
 //! A generic game board for tic-tac-toe and similar games.
-//! **Copyright:** (c) 2025-26  Ma-TA
+//! 
+//! **Copyright** (c) 2025-26  Ma-TA
 
 
 use std::{ fmt, ops::{Deref, DerefMut} };

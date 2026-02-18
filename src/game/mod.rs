@@ -1,5 +1,6 @@
-//! Tic-Tac-Toe game module
-//! **Copyright:** (c) 2025-26  Ma-TA
+//! Tic-Tac-Toe game module.
+//! 
+//! **Copyright** (c) 2025-26  Ma-TA
 
 
 pub mod board;

@@ -1,5 +1,6 @@
 //! Prototype module FOR TESTING PURPOSES ONLY.
-//! **Copyright:** (c) 2025-26  Ma-TA
+//! 
+//! **Copyright** (c) 2025-26  Ma-TA
 
 
 #![allow(dead_code)]
