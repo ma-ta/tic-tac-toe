@@ -1,4 +1,6 @@
 //! Tic-tac-toe rules for the generic game board.
+//! **Copyright:** (c) 2025-26  Ma-TA
+
 
 use super::board::{Board, Cell, PrintSetup};
 

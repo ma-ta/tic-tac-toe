@@ -1,4 +1,6 @@
 //! A generic game board for tic-tac-toe and similar games.
+//! **Copyright:** (c) 2025-26  Ma-TA
+
 
 use std::{ fmt, ops::{Deref, DerefMut} };
 
@@ -32,6 +34,24 @@ impl Default for PrintSetup {
         Self {
             players: vec!['⚪', '⚫'],
             cell_width: 4
+        }
+    }
+}
+
+impl PrintSetup {
+    /// Prints used board symbols
+    pub fn get_symbol(&self, cell: Cell) -> char {
+        match cell {
+            Cell::Empty => ' ',
+            Cell::Player(index) => {
+                if index < self.players.len() as _ {
+                    self.players[index as usize]
+                }
+                // Player not set
+                else {
+                    ' '
+                }
+            }
         }
     }
 }

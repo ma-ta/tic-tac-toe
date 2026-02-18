@@ -1,10 +1,15 @@
-//! Prototype for testing the game only
+//! Prototype module FOR TESTING PURPOSES ONLY.
+//! **Copyright:** (c) 2025-26  Ma-TA
+
 
 #![allow(dead_code)]
 
 mod game;
 
+use std::process::exit;
+
 use game::*;
+use board::Cell;
 use rand::Rng;
 use std::io::{self, Write};
 use std::{thread, time::Duration};
@@ -19,14 +24,26 @@ fn main() {
         "+-------------------------------+"
     );
     const PAUSE: u64 = 2;
-    let mut game = Game::default();
     let mut rng = rand::rng();
+    let mut game = Game::default();
+    let print_setup = PrintSetup { ..Default::default() };
 
     loop {
         print!("\x1B[2J\x1B[H");
         println!("{title}");
-        println!("(Ctrl+C to quit)\n");
-        game.get_board().print(&PrintSetup { ..Default::default() });
+        println!("(Ctrl+C to QUIT)\n");
+
+        println!(
+            "Player 0 (You): {}",
+            print_setup.get_symbol(Cell::Player(0))
+        );
+        println!(
+            "Player 1 (AI) : {}",
+            print_setup.get_symbol(Cell::Player(1))
+        );
+
+        game.get_board().print(&print_setup);
+
         print!("> PLAYER: {} <\n(row col) > ", game.get_current_turn());
         let _ = io::stdout().flush();
         let mut pos: (usize, usize) = (0, 0);
@@ -85,16 +102,39 @@ fn main() {
             GameState::Draw => {
                 print!("\x1B[2J\x1B[H");
                 println!("{title}");
+                println!("{title}");
+                println!(
+                    "Player 0 (You): {}",
+                    print_setup.get_symbol(Cell::Player(0))
+                );
+                println!(
+                    "Player 1 (AI) : {}",
+                    print_setup.get_symbol(Cell::Player(1))
+                );
                 game.get_board().print(&PrintSetup { ..Default::default() });
-                println!("IT'S A DRAW!\n");
-                break;
+                println!(">> IT'S A DRAW! <<\n");
+                // process exit code for testing
+                // (draw = 3)
+                exit(3);
+                //break;
             }
             GameState::Win(player) => {
                 print!("\x1B[2J\x1B[H");
                 println!("{title}");
+                println!(
+                    "Player 0 (You): {}",
+                    print_setup.get_symbol(Cell::Player(0))
+                );
+                println!(
+                    "Player 1 (AI) : {}",
+                    print_setup.get_symbol(Cell::Player(1))
+                );
                 game.get_board().print(&PrintSetup { ..Default::default() });
-                println!("PLAYER {} WON!\n", player);
-                break;
+                println!(">> PLAYER {} WON! <<\n", player);
+                // process exit code for testing
+                // (player 0 = 4, player 1 = 5, ...)
+                exit((player + 4) as _);
+                //break;
             }
             _ => continue
         }
