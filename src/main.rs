@@ -11,7 +11,7 @@ use std::process::exit;
 
 use game::*;
 use board::Cell;
-use rand::Rng;
+use rand::RngExt;
 use std::io::{self, Write};
 use std::{thread, time::Duration};
 
