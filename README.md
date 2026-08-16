@@ -1,8 +1,10 @@
-*🚧&nbsp;UNDER CONSTRUCTION&nbsp;🚧*
+> 🚧 UNDER CONSTRUCTION 🚧
 
-### Tic Tac Toe Prototype in Rust
-- Modular game board
-- Decoupled game rules
-- Simple terminal output for testing
+# Tic-Tac-Toe prototype in Rust
+
+Basic functionality implemented:
+- modular game board,
+- tic-tac-toe game rules,
+- simple terminal output for testing (playtesting).
 
 ![screenshot](res/cli.png)
